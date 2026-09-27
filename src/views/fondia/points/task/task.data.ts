@@ -21,7 +21,7 @@ export const formSchema: FormSchema[] = [
   { field: 'title', label: '标题', component: 'Input', required: true },
   { field: 'description', label: '描述', component: 'InputTextArea' },
   { field: 'rewardPoints', label: '奖励积分', component: 'InputNumber', required: true, defaultValue: 0 },
-  { field: 'actionType', label: '触发类型', component: 'Select', defaultValue: 'MANUAL', componentProps: { options: [{ label: '手动', value: 'MANUAL' }, { label: '浏览', value: 'BROWSE' }, { label: '评论', value: 'COMMENT' }, { label: '分享', value: 'SHARE' }] } },
+  { field: 'actionType', label: '触发类型', component: 'Select', defaultValue: 'MANUAL', componentProps: { options: [{ label: '手动领取', value: 'MANUAL' }, { label: '发布菜谱', value: 'PUBLISH_RECIPE' }, { label: '浏览', value: 'BROWSE' }, { label: '评论', value: 'COMMENT' }, { label: '分享', value: 'SHARE' }, { label: '完善资料', value: 'PROFILE' }] } },
   { field: 'dailyLimit', label: '每日上限', component: 'InputNumber', defaultValue: 1 },
   { field: 'totalLimit', label: '总上限', component: 'InputNumber', defaultValue: 0 },
   { field: 'jumpUrl', label: '跳转链接', component: 'Input' },

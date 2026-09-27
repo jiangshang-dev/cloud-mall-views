@@ -18,7 +18,10 @@
                   用户 {{ item.userId }}
                   <a-tag class="ml-2" :color="statusColor(item.status)">{{ item.status }}</a-tag>
                 </template>
-                <template #description>{{ item.lastMessage || '暂无消息' }}</template>
+                <template #description>
+                  <div v-if="clientText(item)" class="session-client">{{ clientText(item) }}</div>
+                  <div>{{ item.lastMessage || '暂无消息' }}</div>
+                </template>
               </a-list-item-meta>
               <template #actions>
                 <a v-if="item.status === 'WAITING'" @click.stop="handleAccept(item)">接入</a>
@@ -50,7 +53,10 @@
             :class="msg.senderType === 'USER' ? 'chat-item-agent' : 'chat-item-user'"
           >
             <a-tag class="chat-tag" :color="msg.senderType === 'USER' ? 'blue' : 'green'">
-              {{ msg.senderType }}
+              <template v-if="msg.senderType === 'USER'">
+                用户<span v-if="clientText(current)"> · {{ clientText(current) }}</span>
+              </template>
+              <template v-else>{{ msg.senderType }}</template>
             </a-tag>
             <div class="chat-bubble">{{ msg.content }}</div>
           </div>
@@ -97,6 +103,11 @@
     return map[status] || 'default';
   }
 
+  function clientText(item) {
+    if (!item) return '';
+    return [item.clientIp, item.deviceInfo].filter((part) => part).join(' · ');
+  }
+
   function buildWsUrl(agentId: string) {
     const token = userStore.getToken;
     const base = (globSetting.domainUrl || 'http://localhost:9999')
@@ -110,6 +121,12 @@
     try {
       const res = await getSessionList({ pageNo: 1, pageSize: 50 });
       sessions.value = (res?.records || []).filter((s) => s.status !== 'CLOSED' && s.status !== 'AI');
+      if (current.value) {
+        const fresh = sessions.value.find((s) => String(s.id) === String(current.value.id));
+        if (fresh) {
+          current.value = { ...current.value, ...fresh };
+        }
+      }
     } finally {
       loading.value = false;
     }
@@ -326,8 +343,16 @@
     align-items: flex-start;
   }
 
+  .session-client {
+    color: #1677ff;
+    line-height: 1.5;
+  }
+
   .chat-tag {
     margin-bottom: 4px;
+    white-space: normal;
+    height: auto;
+    line-height: 1.5;
   }
 
   .chat-bubble {

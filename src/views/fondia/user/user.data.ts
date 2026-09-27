@@ -1,7 +1,15 @@
 import { BasicColumn, FormSchema } from '/@/components/Table';
+import { render } from '/@/utils/common/renderUtils';
 
 export const columns: BasicColumn[] = [
   { title: '用户ID', dataIndex: 'id', width: 180 },
+  {
+    title: '头像',
+    dataIndex: 'avatar',
+    width: 80,
+    align: 'center',
+    customRender: render.renderAvatar,
+  },
   { title: '用户名', dataIndex: 'username', width: 140 },
   { title: '昵称', dataIndex: 'nickname', width: 140 },
   { title: '手机号', dataIndex: 'phone', width: 130 },
@@ -17,7 +25,36 @@ export const columns: BasicColumn[] = [
     },
   },
   { title: '会员套餐', dataIndex: 'memberPlanCode', width: 120 },
-  { title: '厨艺等级', dataIndex: 'cookingLevel', width: 90 },
+  {
+    title: '性别',
+    dataIndex: 'gender',
+    width: 70,
+    customRender: ({ text }) => {
+      if (text === '1') return '男';
+      if (text === '2') return '女';
+      return '未知';
+    },
+  },
+  {
+    title: '所在地区',
+    dataIndex: 'province',
+    width: 220,
+    ellipsis: true,
+    customRender: ({ record }) => [record?.province, record?.city, record?.district].filter((item) => !!item).join(' '),
+  },
+  {
+    title: '厨艺等级',
+    dataIndex: 'cookingLevel',
+    width: 110,
+    customRender: ({ text }) => {
+      const level = text == null || text === '' ? 1 : Number(text);
+      if (level === 1) return '1 初学者';
+      if (level === 2) return '2 家常';
+      if (level === 3) return '3 熟练';
+      if (level === 4) return '4 达人';
+      return text;
+    },
+  },
   { title: '积分', dataIndex: 'points', width: 80 },
   { title: '成长值', dataIndex: 'growthValue', width: 90 },
   {
@@ -67,6 +104,12 @@ export const searchFormSchema: FormSchema[] = [
 
 export const formSchema: FormSchema[] = [
   { field: 'id', label: 'ID', component: 'Input', show: false },
+  {
+    field: 'avatar',
+    label: '头像',
+    component: 'JImageUpload',
+    componentProps: { fileMax: 1 },
+  },
   { field: 'nickname', label: '昵称', component: 'Input', required: true },
   { field: 'phone', label: '手机号', component: 'Input' },
   { field: 'email', label: '邮箱', component: 'Input' },
@@ -83,7 +126,33 @@ export const formSchema: FormSchema[] = [
     },
   },
   { field: 'sign', label: '个性签名', component: 'InputTextArea' },
-  { field: 'cookingLevel', label: '厨艺等级', component: 'InputNumber', componentProps: { min: 1, max: 4 } },
+  {
+    field: 'birthday',
+    label: '生日',
+    component: 'DatePicker',
+    componentProps: {
+      valueFormat: 'YYYY-MM-DD HH:mm:ss',
+      format: 'YYYY-MM-DD',
+      style: { width: '100%' },
+    },
+  },
+  { field: 'province', label: '省份', component: 'Input' },
+  { field: 'city', label: '城市', component: 'Input' },
+  { field: 'district', label: '区县', component: 'Input' },
+  {
+    field: 'cookingLevel',
+    label: '厨艺等级',
+    component: 'Select',
+    defaultValue: 1,
+    componentProps: {
+      options: [
+        { label: '1 初学者', value: 1 },
+        { label: '2 家常', value: 2 },
+        { label: '3 熟练', value: 3 },
+        { label: '4 达人', value: 4 },
+      ],
+    },
+  },
   { field: 'points', label: '积分', component: 'InputNumber', componentProps: { min: 0 } },
   { field: 'growthValue', label: '成长值', component: 'InputNumber', componentProps: { min: 0 } },
   { field: 'checkInDays', label: '连续签到', component: 'InputNumber', componentProps: { min: 0 } },

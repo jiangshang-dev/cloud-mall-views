@@ -21,6 +21,9 @@
     await resetFields();
     setModalProps({ confirmLoading: false });
     const record = await getUserById({ id: data.record.id });
+    if (record.cookingLevel == null || record.cookingLevel < 1) {
+      record.cookingLevel = 1;
+    }
     await setFieldsValue({ ...record });
   });
 

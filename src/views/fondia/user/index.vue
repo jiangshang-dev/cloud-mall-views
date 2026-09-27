@@ -19,7 +19,6 @@
   </div>
 </template>
 <script lang="ts" setup name="fondia-user">
-  import { ref } from 'vue';
   import { BasicTable, TableAction, ActionItem } from '/@/components/Table';
   import { useModal } from '/@/components/Modal';
   import { useListPage } from '/@/hooks/system/useListPage';
@@ -29,7 +28,6 @@
   import UserModal from './components/UserModal.vue';
 
   const { createMessage } = useMessage();
-  const selectedRowKeys = ref<Array<string | number>>([]);
 
   const { tableContext } = useListPage({
     designScope: 'fondia-user',
@@ -42,7 +40,7 @@
     },
   });
 
-  const [registerTable, { reload }, { rowSelection }] = tableContext;
+  const [registerTable, { reload }, { rowSelection, selectedRowKeys }] = tableContext;
   const [registerModal, { openModal }] = useModal();
 
   function getTableAction(record): ActionItem[] {
@@ -53,8 +51,9 @@
         popConfirm: {
           title: `确认${record.status === 1 ? '禁用' : '启用'}该用户？`,
           confirm: async () => {
-            await updateUserStatus({ id: record.id, status: record.status === 1 ? 0 : 1 });
-            createMessage.success('操作成功');
+            const enabling = record.status !== 1;
+            await updateUserStatus({ id: record.id, status: enabling ? 1 : 0 });
+            createMessage.success(enabling ? '已启用，该用户可以重新登录' : '已禁用，该用户将无法继续使用');
             reload();
           },
         },
