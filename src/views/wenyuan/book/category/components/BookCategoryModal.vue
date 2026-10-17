@@ -12,7 +12,11 @@
 
   const emit = defineEmits(['register', 'success']);
   const isUpdate = ref(false);
-  const title = computed(() => (unref(isUpdate) ? '编辑典籍分类' : '新增典籍分类'));
+  const parentId = ref('');
+  const title = computed(() => {
+    if (unref(isUpdate)) return '修改分类';
+    return unref(parentId) ? '新增下级分类' : '新增分类';
+  });
   const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
     schemas: formSchema,
     showActionButtonGroup: false,
@@ -21,13 +25,29 @@
   const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
     await resetFields();
     isUpdate.value = !!data?.isUpdate;
+    parentId.value = data?.parentId || '';
+    const parentName = data?.parentName || '顶级分类';
     if (unref(isUpdate)) {
-      await setFieldsValue({ ...(await getById({ id: data.record.id })) });
+      const detail = await getById({ id: data.record.id });
+      parentId.value = detail?.parentId || '';
+      await setFieldsValue({ ...detail, parentName });
+    } else {
+      await setFieldsValue({
+        parentId: parentId.value || undefined,
+        parentName,
+        showOnHome: 0,
+        sortNo: 0,
+        status: 1,
+      });
     }
     setModalProps({ confirmLoading: false });
   });
   async function handleSubmit() {
     const values = await validate();
+    delete values.parentName;
+    if (!values.parentId) {
+      values.parentId = null;
+    }
     setModalProps({ confirmLoading: true });
     try {
       await saveOrUpdate(values, unref(isUpdate));

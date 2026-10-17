@@ -19,8 +19,8 @@ export const formSchema: FormSchema[] = [
   { field: 'workId', label: '作品ID', component: 'Input', required: true },
   { field: 'volumeLabel', label: '卷次', component: 'Input' },
   { field: 'title', label: '篇名', component: 'Input', required: true },
-  { field: 'contentOriginal', label: '原文', component: 'InputTextArea', required: true, componentProps: { rows: 8 } },
-  { field: 'contentHans', label: '简体', component: 'InputTextArea', componentProps: { rows: 8 } },
+  { field: 'contentOriginal', label: '原文', component: 'InputTextArea', required: true, componentProps: { rows: 8, placeholder: '一段一行。换行会显示成新段落；整篇不换行时，按一句一段排开。' } },
+  { field: 'contentHans', label: '简体', component: 'InputTextArea', componentProps: { rows: 8, placeholder: '一段一行。换行会显示成新段落；整篇不换行时，按一句一段排开。' } },
   { field: 'sortNo', label: '排序', component: 'InputNumber', defaultValue: 0 },
   { field: 'status', label: '状态', component: 'Select', defaultValue: 1, componentProps: { options: [{ label: '启用', value: 1 }, { label: '停用', value: 0 }] } },
 ];

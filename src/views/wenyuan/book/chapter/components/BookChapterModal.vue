@@ -1,5 +1,5 @@
 <template>
-  <BasicModal v-bind="$attrs" @register="registerModal" :title="title" @ok="handleSubmit" width="860px">
+  <BasicModal v-bind="$attrs" @register="registerModal" :title="title" @ok="handleSubmit" :width="960" :canFullscreen="true">
     <BasicForm @register="registerForm" />
   </BasicModal>
 </template>
@@ -12,8 +12,12 @@
 
   const emit = defineEmits(['register', 'success']);
   const isUpdate = ref(false);
-  const title = computed(() => (unref(isUpdate) ? '编辑篇章正文' : '新增篇章正文'));
-  const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
+  const workTitle = ref('');
+  const title = computed(() => {
+    const base = unref(isUpdate) ? '编辑篇章正文' : '新增篇章正文';
+    return unref(workTitle) ? `${base} · ${unref(workTitle)}` : base;
+  });
+  const [registerForm, { resetFields, setFieldsValue, validate, updateSchema }] = useForm({
     schemas: formSchema,
     showActionButtonGroup: false,
     labelWidth: 110,
@@ -21,8 +25,12 @@
   const [registerModal, { setModalProps, closeModal }] = useModalInner(async (data) => {
     await resetFields();
     isUpdate.value = !!data?.isUpdate;
+    workTitle.value = data?.workTitle || '';
+    await updateSchema([{ field: 'workId', dynamicDisabled: !!data?.lockWork }]);
     if (unref(isUpdate)) {
       await setFieldsValue({ ...(await getById({ id: data.record.id })) });
+    } else if (data?.workId) {
+      await setFieldsValue({ workId: data.workId, sortNo: 0, status: 1 });
     }
     setModalProps({ confirmLoading: false });
   });
